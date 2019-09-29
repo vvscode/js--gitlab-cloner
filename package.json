@@ -1,0 +1,20 @@
+{
+  "name": "gitlab-cloner",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "bin": {
+    "gitlab-cloner": "index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "commander": "^3.0.2",
+    "fs-extra": "^8.1.0",
+    "gitlab": "^11.1.2"
+  }
+}
