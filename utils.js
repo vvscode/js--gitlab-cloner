@@ -1,57 +1,84 @@
-const fsExtra = require('fs-extra');
-const { ProjectsBundle } = require('gitlab');
-const childProcess = require('child_process');
+"use strict";
 
-const execSync = str => childProcess.execSync(str, { stdio: 'inherit' });
+var fsExtra = require("fs-extra");
 
-const getProjectsList = (host, token, filter) => new ProjectsBundle({
-  host,
-  token,
-})
-  .Projects.all()
-  .then((projects) => projects.filter(project => !!project.path_with_namespace.match(filter)));
+var _require = require("gitlab"),
+  ProjectsBundle = _require.ProjectsBundle;
 
-module.exports.cloneAction = (...args) => {
-  const {
-    host,
-    token,
-    ssh,
-    filter,
-    delay
-  } = args[args.length - 1];
+var childProcess = require("child_process");
+
+var execSync = function execSync(str) {
+  return childProcess.execSync(str, {
+    stdio: "inherit"
+  });
+};
+
+var getProjectsList = function getProjectsList(host, token, filter) {
+  return new ProjectsBundle({
+    host: host,
+    token: token
+  }).Projects.all().then(function (projects) {
+    return projects.filter(function (project) {
+      return !!project.path_with_namespace.match(filter);
+    });
+  });
+};
+
+module.exports.cloneAction = function () {
+  var _ref;
+
+  var _ref2 = ((_ref = arguments.length - 1),
+    _ref < 0 || arguments.length <= _ref ? undefined : arguments[_ref]),
+    host = _ref2.host,
+    token = _ref2.token,
+    ssh = _ref2.ssh,
+    filter = _ref2.filter,
+    delay = _ref2.delay;
 
   if (!token) {
-    return console.log('token is required param');
+    return console.log("token is required param");
   }
+
   if (!host) {
-    return console.log('host is required param');
+    return console.log("host is required param");
   }
 
-  console.log('cloneAction', {
-    host,
-    token,
-    ssh,
-    filter,
+  console.log("cloneAction", {
+    host: host,
+    token: token,
+    ssh: ssh,
+    filter: filter
   });
-
-  return Promise.resolve(console.log('Fetch projects'))
-    .then(() => getProjectsList(host, token, filter))
-    .then(projects => {
-      console.log(`${projects.length} project(s) found`);
+  return Promise.resolve(console.log("Fetch projects"))
+    .then(function () {
+      return getProjectsList(host, token, filter);
+    })
+    .then(function (projects) {
+      console.log(projects.length + " project(s) found");
       return projects;
     })
-    .then((projects) => {
-      projects.map((project, index) => {
-        console.log(`Cloning project #${index + 1}: ${project.name_with_namespace}`)
-        const targetDir = project.namespace.full_path;
+    .then(function (projects) {
+      projects.map(function (project, index) {
+        console.log(
+          "Cloning project #" + (index + 1) + ": " + project.name_with_namespace
+        );
+        var targetDir = project.namespace.full_path;
         fsExtra.ensureDirSync(targetDir);
-        execSync(` 
-          cd "${targetDir}"
-          git clone ${project.ssh_url_to_repo}
-          sleep ${(+delay || 0)}
-        `);
+        execSync(
+          ' \n          cd "' +
+          targetDir +
+          '"\n          git clone ' +
+          project.ssh_url_to_repo +
+          "\n          sleep " +
+          (+delay || 0) +
+          "\n        "
+        );
       });
     })
-    .then(() => console.log('\n\nDone'))
-    .catch((err) => console.error('cloning error', err));
-}
+    .then(function () {
+      return console.log("\n\nDone");
+    })
+    .catch(function (err) {
+      return console.error("cloning error", err);
+    });
+};
