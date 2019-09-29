@@ -2,12 +2,12 @@
 "use strict";
 
 var program = require("commander");
-var package = require('./package.json');
+var pkg = require('./package.json');
 
 var cloneAction = require("./utils").cloneAction;
 
 program
-  .version(package.version)
+  .version(pkg.version)
   .description("Allows to clone gitlbal structure")
   .command("clone")
   .option("--host [host]", "GitLab host", "https://gitlab.com")

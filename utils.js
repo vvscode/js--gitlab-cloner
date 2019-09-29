@@ -43,12 +43,6 @@ module.exports.cloneAction = function () {
     return console.log("host is required param");
   }
 
-  console.log("cloneAction", {
-    host: host,
-    token: token,
-    ssh: ssh,
-    filter: filter
-  });
   return Promise.resolve(console.log("Fetch projects"))
     .then(function () {
       return getProjectsList(host, token, filter);

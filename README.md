@@ -7,7 +7,7 @@ Allows to clone full gilab structure to current directory. Also allows to filter
 ## How to use:
 
 ```bash
-npx gl-cloner clone --host https://gitlab.custom.domain --token YOUR_ACCESS_TOKEN
+npx gl-cloner clone --host https://gitlab.custom.domain --token YOUR_ACCESS_TOKEN --delay 5
 ```
 
 ```
