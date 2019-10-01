@@ -20,6 +20,8 @@ program
     "Use ssh for cloning (http(s) by default) !!!NOT SUPPORTED YET",
     true
   )
+  .option('--maxPages [maxPages]', 'Max number of pages to read (default is 2)', 2)
+  .option('--perPage [perPage]', 'Page size (max is 100, default is 100)', 100)
   .option("--filter [filter]", "Filter to get repos", "")
   .option("--delay [delay]", "Delay between clone calls", 0)
   .parse(process.argv)

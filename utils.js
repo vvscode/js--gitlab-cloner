@@ -13,11 +13,15 @@ var execSync = function execSync(str) {
   });
 };
 
-var getProjectsList = function getProjectsList(host, token, filter) {
+var getProjectsList = function getProjectsList(host, token, filter, maxPages, perPage) {
+  console.log('getProjectsList', arguments);
   return new ProjectsBundle({
     host: host,
     token: token
-  }).Projects.all().then(function (projects) {
+  }).Projects.all({
+    maxPages,
+    perPage,
+  }).then(function (projects) {
     return projects.filter(function (project) {
       return !!project.path_with_namespace.match(filter);
     });
@@ -33,7 +37,10 @@ module.exports.cloneAction = function () {
     token = _ref2.token,
     ssh = _ref2.ssh,
     filter = _ref2.filter,
-    delay = _ref2.delay;
+    delay = _ref2.delay,
+    maxPages = _ref2.maxPages,
+    perPage = _ref2.perPage;
+
 
   if (!token) {
     return console.log("token is required param");
@@ -45,7 +52,7 @@ module.exports.cloneAction = function () {
 
   return Promise.resolve(console.log("Fetch projects"))
     .then(function () {
-      return getProjectsList(host, token, filter);
+      return getProjectsList(host, token, filter, maxPages, perPage);
     })
     .then(function (projects) {
       console.log(projects.length + " project(s) found");
