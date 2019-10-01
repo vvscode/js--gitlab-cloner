@@ -13,7 +13,7 @@ var execSync = function execSync(str) {
   });
 };
 
-var getProjectsList = function getProjectsList(host, token, filter, maxPages, perPage) {
+var getProjectsList = function getProjectsList(host, token, filter, maxPages, perPage, includeArchived = false) {
   console.log('getProjectsList', arguments);
   return new ProjectsBundle({
     host: host,
@@ -21,6 +21,7 @@ var getProjectsList = function getProjectsList(host, token, filter, maxPages, pe
   }).Projects.all({
     maxPages,
     perPage,
+    archived: !!includeArchived,
   }).then(function (projects) {
     return projects.filter(function (project) {
       return !!project.path_with_namespace.match(filter);
@@ -39,6 +40,7 @@ module.exports.cloneAction = function () {
     filter = _ref2.filter,
     delay = _ref2.delay,
     maxPages = _ref2.maxPages,
+    includeArchived = _ref2.includeArchived,
     perPage = _ref2.perPage;
 
 
@@ -52,7 +54,7 @@ module.exports.cloneAction = function () {
 
   return Promise.resolve(console.log("Fetch projects"))
     .then(function () {
-      return getProjectsList(host, token, filter, maxPages, perPage);
+      return getProjectsList(host, token, filter, maxPages, perPage, includeArchived);
     })
     .then(function (projects) {
       console.log(projects.length + " project(s) found");
