@@ -24,6 +24,7 @@ program
   .option('--perPage [perPage]', 'Page size (max is 100, default is 100)', 100)
   .option("--filter [filter]", "Filter to get repos", "")
   .option("--delay [delay]", "Delay between clone calls", 0)
+  .option("--includeArchived", "Download archived repose also (default is false)", false)
   .parse(process.argv)
   .action(cloneAction);
 program.parse(process.argv);

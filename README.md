@@ -19,5 +19,6 @@ Options:
   --perPage [perPage]    Page size (max is 100, default is 100) (default: 100)
   --filter [filter]      Filter to get repos (default: "")
   --delay [delay]        Delay between clone calls (default: 0)
+  --includeArchived      Download archived repose also (default is false) (default: false)
   -h, --help             output usage information
 ```
