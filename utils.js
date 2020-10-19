@@ -1,48 +1,46 @@
-"use strict";
+const fsExtra = require("fs-extra");
+const ProjectsBundle = require("gitlab").ProjectsBundle;
+const childProcess = require("child_process");
 
-var fsExtra = require("fs-extra");
-
-var _require = require("gitlab"),
-  ProjectsBundle = _require.ProjectsBundle;
-
-var childProcess = require("child_process");
-
-var execSync = function execSync(str) {
+const execSync = (str) => {
   return childProcess.execSync(str, {
     stdio: "inherit"
   });
 };
 
-var getProjectsList = function getProjectsList(host, token, filter, maxPages, perPage, includeArchived = false) {
-  console.log('getProjectsList', arguments);
+const getProjectsList = function getProjectsList(
+  host,
+  token,
+  filter,
+  maxPages,
+  perPage,
+  includeArchived = false
+) {
   return new ProjectsBundle({
-    host: host,
-    token: token
+    host,
+    token
   }).Projects.all({
     maxPages,
     perPage,
-    archived: !!includeArchived,
-  }).then(function (projects) {
-    return projects.filter(function (project) {
-      return !!project.path_with_namespace.match(filter);
-    });
-  });
+    archived: !!includeArchived
+  }).then(projects =>
+    projects.filter(
+      ({ path_with_namespace }) => !!path_with_namespace.match(filter)
+    )
+  );
 };
 
-module.exports.cloneAction = function () {
-  var _ref;
-
-  var _ref2 = ((_ref = arguments.length - 1),
-    _ref < 0 || arguments.length <= _ref ? undefined : arguments[_ref]),
-    host = _ref2.host,
-    token = _ref2.token,
-    ssh = _ref2.ssh,
-    filter = _ref2.filter,
-    delay = _ref2.delay,
-    maxPages = _ref2.maxPages,
-    includeArchived = _ref2.includeArchived,
-    perPage = _ref2.perPage;
-
+export function cloneAction(params) {
+  const {
+    host,
+    token,
+    ssh,
+    filter,
+    delay,
+    maxPages,
+    includeArchived,
+    perPage
+  } = params;
 
   if (!token) {
     return console.log("token is required param");
@@ -53,35 +51,27 @@ module.exports.cloneAction = function () {
   }
 
   return Promise.resolve(console.log("Fetch projects"))
-    .then(function () {
-      return getProjectsList(host, token, filter, maxPages, perPage, includeArchived);
-    })
-    .then(function (projects) {
-      console.log(projects.length + " project(s) found");
+    .then(() =>
+      getProjectsList(host, token, filter, maxPages, perPage, includeArchived)
+    )
+    .then(projects => {
+      console.log(`${projects.length} project(s) found`);
       return projects;
     })
-    .then(function (projects) {
-      projects.map(function (project, index) {
-        console.log(
-          "Cloning project #" + (index + 1) + ": " + project.name_with_namespace
-        );
-        var targetDir = project.namespace.full_path;
-        fsExtra.ensureDirSync(targetDir);
-        execSync(
-          ' \n          cd "' +
-          targetDir +
-          '"\n          git clone ' +
-          project.ssh_url_to_repo +
-          "\n          sleep " +
-          (+delay || 0) +
-          "\n        "
-        );
-      });
+    .then(projects => {
+      projects.map(
+        ({ name_with_namespace, namespace, ssh_url_to_repo }, index) => {
+          console.log(`Cloning project #${index + 1}: ${name_with_namespace}`);
+          const targetDir = namespace.full_path;
+          fsExtra.ensureDirSync(targetDir);
+          execSync(`
+        cd "${targetDir}
+        git clone ${ssh_url_to_repo}
+        sleep ${+delay || 0}
+        `);
+        }
+      );
     })
-    .then(function () {
-      return console.log("\n\nDone");
-    })
-    .catch(function (err) {
-      return console.error("cloning error", err);
-    });
-};
+    .then(() => console.log("Done"))
+    .catch(err => console.error("cloning error", err));
+}
