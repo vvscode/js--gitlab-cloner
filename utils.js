@@ -2,7 +2,7 @@ const fsExtra = require("fs-extra");
 const ProjectsBundle = require("gitlab").ProjectsBundle;
 const childProcess = require("child_process");
 
-const execSync = function execSync(str) {
+const execSync = (str) => {
   return childProcess.execSync(str, {
     stdio: "inherit"
   });
